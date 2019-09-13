@@ -1,0 +1,35 @@
+
+# Constant for text
+SQUARE_BLACK_SMALL = "\u25FE"
+SQUARE_BLACK = "\u25A0"
+SQUARE_WHITE = "\u25A1"
+FISH_EYE = "\u25C9"
+
+# Optional faces, so far redundant
+FACE_LEFT = "\u25C0"
+FACE_RIGHT = "\u25B6"
+FACE_UP = "\u25B2"
+FACE_DOWN = "\u25BC"
+
+# Basic colours of objects
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+BLACK = (0, 0, 0)
+
+# Snake constants
+APPLE_TIME = 100
+LIFE_MAX = 500
+LIFE_START = 200
+
+LEN_SNAKE_MAX = 200
+LEN_SNAKE_START = 3
+
+DIRECTION_START = "UP"
+DIRECTION_VALID = ["LEFT", "RIGHT", "UP", "DOWN"]
+DIRECTION_VALUE = dict(LEFT=1, RIGHT=-1, UP=2, DOWN=-2)
+
+# Atari environment constants
+GET_ACTION_MEANING = ["NOOP"] + DIRECTION_VALID
+ACTION_SPACE = len(GET_ACTION_MEANING)
