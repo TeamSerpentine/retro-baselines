@@ -1,8 +1,6 @@
 
-
-import numpy as np
-
 from collections import deque
+
 from snake.objects import constants
 from .base_object import Object
 
@@ -10,40 +8,46 @@ from .base_object import Object
 class Snake(Object):
     """
         Snake, object that can move over the board and interact with other objects.
+
+        :param position: utils.Point
+            The start position of the snake.
     """
-    colour = constants.GREEN
-    text_fancy = constants.SQUARE_BLACK
-    text = "0"
+    rgb = constants.GREEN_SERPENTINE
+    ansi_fancy = constants.SQUARE_BLACK
+    ansi = "0"
 
     APPLE_TIME = constants.APPLE_TIME
     LIFE_MAX = constants.LIFE_MAX
     LEN_SNAKE_START = constants.LEN_SNAKE_START
+    LEN_SNAKE_MAX = constants.LEN_SNAKE_MAX
 
     def __init__(self, position):
-        self.body = deque(maxlen=constants.LEN_SNAKE_MAX)
-        self.body.append(position)
-        self._direction = constants.DIRECTION_START
         self.position = position
 
+        # Define start direction and timers
+        self._direction = constants.DIRECTION_START
         self.life_left = constants.LIFE_START    # Time until snake dies
         self.life_time = 0                       # Time snake lives
-
-        self.life_actions = []      # Action taken while alive
-        self.pos_eaten_food = []    # Tracks location of eaten food for replay
         self.alive = True
 
+        # Create the snake body
+        self.body = deque(maxlen=self.LEN_SNAKE_MAX)
+        self.body.append(self.position)
         for _ in range(1, self.LEN_SNAKE_START):
             self.increase_length()
 
     def __contains__(self, item):
+        """ Check if a snake is colliding with another snake.  """
         return bool(set(item.body) & set(self.body))
 
     def __eq__(self, other):
+        """ Check if the snake is the same one, by checking all body positions.  """
         if hasattr(other, "body"):
             return not (set(self.body) - set(other.body))
         return False
 
     def __ne__(self, other):
+        """ Check if the snake is not the same one, by checking all body positions.  """
         if hasattr(other, "body"):
             return bool(set(self.body) - set(other.body))
         return False
@@ -58,6 +62,7 @@ class Snake(Object):
         return f"<class {self.__class__.__name__} (x={self.position.x}, y={self.position.y})>"
 
     def specifics(self):
+        """ Returns a lot of information about the snake.  """
         return dict(alive=self.alive, facing=self.direction,
                     length=len(self), body=self.body,
                     head=self.get_head(), tail=self.get_tail(),
@@ -83,9 +88,11 @@ class Snake(Object):
                 self._direction = value
 
     def get_head(self):
+        """ Returns the head position of the snake.  """
         return self.body[0]
 
     def get_tail(self):
+        """ Returns the tail position of the snake.  """
         return self.body[-1]
 
     def increase_length(self):
@@ -93,7 +100,6 @@ class Snake(Object):
             Will increase the length of the snake on the next step.
         """
         self.body.append(self.body[-1])
-        self.pos_eaten_food.append(self.get_head())
         self.life_left = min(self.life_left + self.APPLE_TIME, self.LIFE_MAX)
 
     def step(self):
@@ -101,13 +107,11 @@ class Snake(Object):
             Updates the snake position to the new head location
         """
         new_head = self.next_step_head()
-
         self.body.pop()
 
         self.body.appendleft(new_head)
         self.position = self.get_head()
 
-        self.life_actions.append(self.direction)
         self.life_time += 1
         self.life_left -= 1
 
@@ -123,7 +127,7 @@ class Snake(Object):
             new_head.x += 1 if self.direction == "RIGHT" else -1
 
         if self.direction in ["UP", "DOWN"]:
-            new_head.y += 1 if self.direction == "UP" else -1
+            new_head.y += 1 if self.direction != "UP" else -1
 
         return new_head
 

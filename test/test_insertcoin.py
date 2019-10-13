@@ -5,7 +5,7 @@ import gym
 import unittest
 from insertcoin import InsertCoin
 from models.random_model import RandomModel
-from utils.suppress import suppress_stdout
+from tools.suppress import suppress_stdout
 
 
 class TestInsertCoin(unittest.TestCase):
@@ -30,8 +30,8 @@ class TestInsertCoin(unittest.TestCase):
         self.assertIsNotNone(self.render)
         self.assertIsNotNone(self.clip)
         self.assertIsNotNone(self.log)
-        self.assertLess(0, self.step_limit)
-        self.assertLess(0, self.game_limit)
+        self.assertEqual(0, self.step_limit)
+        self.assertEqual(0, self.game_limit)
 
     def test_arg_parser_types(self):
         """
@@ -44,11 +44,3 @@ class TestInsertCoin(unittest.TestCase):
         self.assertIsInstance(self.log, bool)
         self.assertIsInstance(self.step_limit, int)
         self.assertIsInstance(self.game_limit, int)
-
-    def test_model(self):
-        """
-        Test if model function returns correct model types.
-        """
-        env = gym.make("Pong-v0")
-        self.assertIsInstance(self.runner._model("random_model", "Pong-v0", env.reset().size, env.action_space),
-                              RandomModel)

@@ -1,4 +1,3 @@
-
 import abc
 import numpy as np
 from abc import ABC
@@ -11,33 +10,31 @@ class BaseBoard(ABC):
         """  Initialize self.  See help(type(self)) for accurate signature.  """
         pass
 
-    @abc.abstractmethod
     def __str__(self):
         """  Return str(self).  """
         pass
 
-    @abc.abstractmethod
     def __repr__(self):
         """ Return repr(self).  """
         pass
 
     @abc.abstractmethod
-    def _get_obs(self, *args, **kwargs) -> np.array:
+    def obs(self, *args, **kwargs) -> np.array:
         """ Returns the observation from the board.  """
         pass
 
     @abc.abstractmethod
-    def _get_reward(self, *args, **kwargs) -> int:
+    def reward(self, *args, **kwargs) -> int:
         """ Returns the reward of the current step.  """
         pass
 
     @abc.abstractmethod
-    def _get_done(self, *args, **kwargs) -> bool:
+    def done(self, *args, **kwargs) -> bool:
         """ Returns whether the game is finished playing or not.  """
         pass
 
     @abc.abstractmethod
-    def _get_info(self, *args, **kwargs) -> dict:
+    def info(self, *args, **kwargs) -> dict:
         """ Returns extra information about the current game step.  """
         pass
 
@@ -67,4 +64,9 @@ class BaseBoard(ABC):
     @abc.abstractmethod
     def random_step(self) -> int:
         """ Returns a random move in the available action space of the board.  """
+        pass
+
+    @abc.abstractmethod
+    def seed(self, seed: [list, None]) -> list:
+        """ Set the seed of the game, makes it possible to reproduce games.  """
         pass

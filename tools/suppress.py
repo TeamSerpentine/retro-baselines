@@ -1,8 +1,8 @@
-
 from contextlib import contextmanager
 import os
 import sys
 import codecs
+
 
 @contextmanager
 def suppress_stdout():

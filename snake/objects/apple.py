@@ -7,9 +7,9 @@ class Apple(Object):
     """
         Apple, object that can be eaten in the snake.
     """
-    colour = constants.RED
-    text_fancy = constants.FISH_EYE
-    text = "A"
+    rgb = constants.RED
+    ansi_fancy = constants.FISH_EYE
+    ansi = "A"
 
     def __init__(self, position: Point):
         self.position = position

@@ -1,5 +1,4 @@
 
-
 import unittest
 
 from snake.objects.snake import Snake
@@ -7,7 +6,6 @@ from snake.objects.utils import Point
 
 
 class TestSnake(unittest.TestCase):
-
     def setUp(self) -> None:
         self.pos_start = Point(50, 120)
         self.pos_diff = Point(50, 115)
@@ -37,7 +35,7 @@ class TestSnake(unittest.TestCase):
 
             self.assertEqual(self.pos_start.x, self.snake.get_head().x,
                              "x direction is no longer correct")
-            self.assertEqual(self.pos_start.y + steps_up, self.snake.get_head().y,
+            self.assertEqual(self.pos_start.y - steps_up, self.snake.get_head().y,
                              "y direction is no longer correct")
 
             self.assertEqual(self.pos_start.x, self.snake.get_tail().x,
@@ -52,7 +50,7 @@ class TestSnake(unittest.TestCase):
 
             self.assertEqual(self.pos_start.x - steps_left, self.snake.get_head().x,
                              "x direction is no longer correct")
-            self.assertEqual(self.pos_start.y + steps_up, self.snake.get_head().y,
+            self.assertEqual(self.pos_start.y - steps_up, self.snake.get_head().y,
                              "y direction is no longer correct")
 
             self.assertEqual(self.pos_start.x, self.snake.get_tail().x,
@@ -68,12 +66,12 @@ class TestSnake(unittest.TestCase):
                 self.snake.step()
 
             if direction == "UP":
-                self.assertEqual((self.pos_start.x, self.pos_start.y + steps),
+                self.assertEqual((self.pos_start.x, self.pos_start.y - steps),
                                  self.snake.get_head().as_value(),
                                  "Mistake in UP")
 
             elif direction == "LEFT":
-                self.assertEqual((self.pos_start.x - steps, self.pos_start.y + steps),
+                self.assertEqual((self.pos_start.x - steps, self.pos_start.y - steps),
                                  self.snake.get_head().as_value(),
                                  "Mistake in LEFT")
 
@@ -93,7 +91,9 @@ class TestSnake(unittest.TestCase):
         self.assertEqual(3, len(self.snake.body), "Snake length is no longer correct")
 
     def test_contains(self):
-        snake_diff = Snake(self.pos_diff)
+        # Please note that we can't swap 'UP' and 'DOWN' or 'LEFT' and 'RIGHT'
+        # Due to the restriction that the snake can not turn 180 degrees from the previous direction.
+        snake_diff = Snake(Point(self.pos_start.x, self.pos_start.y+5))
         snake_diff.direction = self.start_direction
 
         for _ in range(4):

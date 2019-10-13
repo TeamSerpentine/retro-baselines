@@ -6,7 +6,10 @@ A model takes actions each snake frame and uses a logger to store data.
 """
 
 import abc
+import numpy as np
+
 from abc import ABCMeta
+from typing import Union
 
 
 class BaseModel(metaclass=ABCMeta):
@@ -15,31 +18,30 @@ class BaseModel(metaclass=ABCMeta):
     """
 
     @abc.abstractmethod
-    def __init__(self, game_name, mode_name, logger_path, input_shape, action_space):
+    def __init__(self, game_name: str, input_shape: Union[tuple, list], action_space: int, logger_path: str):
         """
             Initialize base model.
 
             :param game_name: Name of the current snake.
-            :param mode_name: Name of the current running mode.
-            :param logger_path: Path to the log files.
             :param input_shape: Shape of the input array.
-            :param action_space: Set of actions that are available in the snake.
+            :param action_space: Set of actions that are available in the game
+            :param logger_path: Path to the log files.
         """
         pass
 
     @abc.abstractmethod
-    def save_game(self, score, step, run):
+    def save_game(self, score: Union[int, float], step: int, run: int):
         """
             Save information of one snake run using the logger.
 
-            :param score: Score this run.
+            :param score: intScore this run.
             :param step: Amount of steps this run.
             :param run: Current run number.
         """
         pass
 
     @abc.abstractmethod
-    def action(self, state):
+    def action(self, state: np.ndarray):
         """
             Return action according to the current state of the snake.
 
@@ -48,7 +50,8 @@ class BaseModel(metaclass=ABCMeta):
         pass
 
     @abc.abstractmethod
-    def remember(self, state, action, reward, next_state, done):
+    def remember(self, state: np.ndarray, action: int, reward: Union[int, float],
+                 next_state: np.ndarray, done: bool):
         """
             Store snake step information in internal memory.
 
@@ -61,7 +64,7 @@ class BaseModel(metaclass=ABCMeta):
         pass
 
     @abc.abstractmethod
-    def step_update(self, total_step):
+    def step_update(self, total_step: int):
         """
             Update model with total amount of steps taken.
 
@@ -71,7 +74,7 @@ class BaseModel(metaclass=ABCMeta):
         pass
 
     @abc.abstractmethod
-    def finalize_game(self, score, step, run):
+    def finalize_game(self, score: Union[int, float], step: int, run: int):
         """
             Called at the end of a single game.
 

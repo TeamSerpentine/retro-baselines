@@ -1,5 +1,4 @@
 
-
 import unittest
 
 from snake.boards.classic import Board
@@ -9,7 +8,7 @@ from snake.objects import constants
 
 class TestBoard(unittest.TestCase):
     def setUp(self) -> None:
-        self.board = Board()
+        self.board = Board(width=25, height=25)
 
     def test_add_snake_random(self):
         self.board.add_object('snake')
@@ -35,3 +34,18 @@ class TestBoard(unittest.TestCase):
         snake_2 = self.board.objects['snake'].pop()
 
         self.assertEqual(False, snake_1 in snake_2, "These are the same snakes")
+
+    def test_setting_seed(self):
+        """ Test if the same board is produced after setting a seed.  """
+        seed = self.board.seed()
+
+        for _ in range(10):
+            self.board.reset()
+        state = self.board.board
+
+        self.board.seed(seed)
+        for _ in range(10):
+            self.board.reset()
+
+        self.assertEqual([o.__class__.__name__ for x in state for o in x],
+                         [o.__class__.__name__ for x in self.board.board for o in x], "Unable to reproduce same board")

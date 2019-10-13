@@ -43,5 +43,5 @@ This runs the default game while choosing random actions available from the acti
 
 In order to run snake and render it you can also run it from the command prompt.
 ```
-python insertcoin.py -g snake -r
+python insertcoin.py -g Snake-v0 -r
 ```

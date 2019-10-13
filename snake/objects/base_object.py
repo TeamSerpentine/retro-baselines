@@ -4,10 +4,10 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 
 
-class BaseObject(ABC):
+class AbstractObject(ABC):
     position: Point     # Position
-    colour: tuple       # For image displaying
-    text: str           # For string display
+    rgb: tuple       # For image displaying
+    ansi: str           # For string display
 
     @abstractmethod
     def __str__(self): ...
@@ -25,11 +25,11 @@ class BaseObject(ABC):
     def location(self) -> list: ...
 
 
-class Object(BaseObject):
+class Object(AbstractObject):
     position = Point(-1, -1)
-    colour = (0, 0, 0)
-    text = "?"
-    text_fancy = "?"        # For unicode characters display
+    rgb = (0, 0, 0)
+    ansi = "?"
+    ansi_fancy = "?"        # For unicode characters display
 
     def __init__(self, position):
         self.position = position

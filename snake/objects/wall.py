@@ -7,9 +7,9 @@ class Wall(Object):
     """
         Wall, object that kills snake.
     """
-    colour = constants.BLACK
-    text_fancy = constants.SQUARE_WHITE
-    text = "X"
+    rgb = constants.BLACK
+    ansi_fancy = constants.SQUARE_WHITE
+    ansi = "X"
 
     def __init__(self, position):
         self.position = position

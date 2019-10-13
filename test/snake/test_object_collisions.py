@@ -3,7 +3,7 @@
 import unittest
 
 from snake import constants
-from snake.objects.constants import LEN_SNAKE_START, DIRECTION_VALID
+from snake.objects.constants import LEN_SNAKE_START
 from snake.boards.classic import Board
 
 from snake.objects.wall import Wall
@@ -13,7 +13,7 @@ from snake.objects.snake import Snake
 from snake.objects.utils import Point
 
 
-class TestSnake(unittest.TestCase):
+class TestCollision(unittest.TestCase):
 
     def setUp(self) -> None:
         self.objects_name = ["wall", "ground", "apple", "snake"]
@@ -45,27 +45,26 @@ class TestSnake(unittest.TestCase):
 
     def test_snake_eat_apple(self):
         self.board = Board(width=50, height=50)
-        self.board.add_object("snake", Point(x=20, y=32))
-        self.board.add_object("apple", Point(x=20, y=33))
+        self.board.add_object("snake", Point(x=20, y=33))
+        self.board.add_object("apple", Point(x=20, y=32))
 
         snake = self.board.objects['snake'][0]
-        snake.direction = "UP"
-        self.board._step_snake(snake)
+        _, reward, _, _ = self.board.step(constants.GET_ACTION_MEANING.index("UP"))
 
-        self.assertEqual(constants.DEFAULT_REWARD_PER_APPLE, self.board._get_reward(),
+        self.assertEqual(constants.DEFAULT_REWARD_PER_APPLE + constants.DEFAULT_REWARD_PER_STEP, reward,
                          "Snake eating apple incorrect points awarded")
 
-        self.assertEqual(LEN_SNAKE_START + 1, len(self.board.objects['snake'][0]),
+        self.assertEqual(LEN_SNAKE_START+1, len(snake),
                          "Snake length is not increased after eating apple")
 
     def test_snake_wall(self):
         self.board = Board(width=50, height=50)
-        self.board.add_object("snake", Point(x=1, y=48))
+        self.board.add_object("snake", Point(x=1, y=30))
 
         snake = self.board.objects['snake'][0]
-        snake.direction = "UP"
-        self.board._step_snake(snake)
+        _, _, done, _ = self.board.step(constants.GET_ACTION_MEANING.index("LEFT"))
+        self.board.step(1)
 
-        self.assertEqual(True, self.board._get_done(), "Game over is not detected upon dying")
-        self.assertEqual(False, self.board.objects['snake'][0].alive,
+        self.assertEqual(True, done, "Game over is not detected upon dying")
+        self.assertEqual(False, snake.alive,
                          "Snake didn't die upon hitting the wall")

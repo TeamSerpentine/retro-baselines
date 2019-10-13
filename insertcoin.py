@@ -6,10 +6,12 @@ The main file and command line interface for retro_baselines.
 import gym
 import argparse
 import numpy as np
-import snake
-from utils.progressbar import Progress
 
-from models.random_model import RandomModel
+import importlib
+
+import snake  # Required for registering games into gym
+from tools.progressbar import Progress
+from tools.finder import model_finder
 
 
 class InsertCoin:
@@ -21,17 +23,17 @@ class InsertCoin:
 
     def __init__(self, run_main=True):
         game_name, game_mode, render, step_limit, game_limit, clip, log = self._args()
-        if game_name in self._get_all_gym_environments_names():
-            env = gym.make(game_name)
-        else:
-            env = snake.make(game_name)
+        if game_name not in self._get_all_gym_environments_names():
+            valid = '\n  '.join(self._get_all_gym_environments_names())
+            raise ValueError(f"Game '{game_name}' not inside gym valid options:\n  {valid}")
 
+        env = gym.make(game_name)
         if run_main:
             self._main_loop(self._model(game_mode, game_name, self._input_shape(env), env.action_space),
                             step_limit, game_limit, env, render, clip, log)
 
     @staticmethod
-    def _main_loop(model, step_limit, game_limit,  env, render, clip, log):
+    def _main_loop(model, step_limit, game_limit, env, render, clip, log):
         """
             Run main snake loop using the settings from the command line interface or the default settings.
 
@@ -53,7 +55,8 @@ class InsertCoin:
         # Looping over multiple games
         while True:
             # Check step and snake limit
-            if game_limit is not None and games >= game_limit:
+            if 0 < game_limit <= games:
+                progress.done(value=total_step)
                 print("Maximum number of games reached: " + str(game_limit))
                 exit(0)
 
@@ -64,7 +67,7 @@ class InsertCoin:
             step = 0
             score = 0
             while True:
-                if total_step <= step_limit:
+                if step_limit == 0 or total_step <= step_limit:
                     total_step += 1
                     step += 1
 
@@ -89,6 +92,7 @@ class InsertCoin:
                     if (total_step % 1000) == 0:
                         progress.increase(1000)
                 else:
+                    progress.done(value=step_limit)
                     print("Reached total step limit of: " + str(step_limit))
                     exit(0)
 
@@ -97,7 +101,7 @@ class InsertCoin:
         if hasattr(env.reset(), "size"):
             return env.reset().shape
         if isinstance(env.reset(), str):
-            return (1,)
+            return 1,
         else:
             raise ValueError("No support for this game")
 
@@ -108,15 +112,15 @@ class InsertCoin:
         parser = argparse.ArgumentParser()
         available_games = self._get_all_environment_names()
         parser.add_argument("-g", "--game",
-                            help="Choose from available games: " + str(available_games) + ". Default is 'Breakout-v0'.",
-                            default="Breakout-v0")
+                            help="Choose from available games: " + str(available_games) + ". Default is 'Snake-v0'.",
+                            default="Snake-v0")
         parser.add_argument("-m", "--model", help="Choose from available models: random_model."
-                                                 " Default is 'random_model'.", default="random_model")
-        parser.add_argument("-tsl", "--total_step_limit", help="Choose how many total steps (snake frames) "
+                                                  " Default is 'random_model'.", default="random_model")
+        parser.add_argument("-tsl", "--total_step_limit", help="Choose how many total steps (frames) "
                                                                "should be performed. "
-                                                               "Default is '5000000'.", default=5000000, type=int)
+                                                               "Default is '0 (no limit)'.", default=0, type=int)
         parser.add_argument("-tgl", "--total_game_limit", help="Choose after how many games we should stop. Default is "
-                                                               "None (no limit).", default=5000000, type=int)
+                                                               "0 (no limit).", default=0, type=int)
         parser.add_argument("-r", "--render", help="Include if you want to render game.",
                             action="store_true")
         parser.add_argument("-c", "--clip",
@@ -144,12 +148,18 @@ class InsertCoin:
         return all_game_names
 
     @staticmethod
-    def _model(game_mode, game_name, input_shape, action_space):
-        if game_mode == "random_model":
-            return RandomModel(game_name, input_shape, action_space)
-        else:
-            print("Unrecognized mode. Use --help")
-            exit(1)
+    def _model(game_mode, *args, **kwargs):
+        """ Returns an initialized model.
+
+            :param game_mode: str
+                Should be either the name of the modules located in the
+                models folder or the name of the class inside one of the modules
+                located in models.
+
+                In case there are multiple classes inside a module, the first
+                one will be selected.
+        """
+        return model_finder(game_mode)(*args, **kwargs)
 
     @staticmethod
     def _get_all_gym_environments_names():

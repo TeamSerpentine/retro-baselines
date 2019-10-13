@@ -7,9 +7,9 @@ class Ground(Object):
     """
         Ground object on which other object are free to be placed.
     """
-    colour = constants.WHITE
-    text_fancy = constants.SQUARE_BLACK_SMALL
-    text = "."
+    rgb = constants.WHITE
+    ansi_fancy = constants.SQUARE_BLACK_SMALL
+    ansi = "."
 
     def __init__(self, position):
         self.position = position
